@@ -14,20 +14,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
         uses: azure/setup-helm@v4
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
-        with:
-          charts_dir: deploy
+      # appVersion comes from the tag so the chart pulls the image that
+      # release-image.yml pushes for this same tag (v1.6.1-dexilion -> 1.6.1-dexilion)
+      - name: Package chart
+        run: helm package deploy/cert-manager-sync --app-version "${GITHUB_REF_NAME#v}" --destination dist
+
+      # Attach the packaged chart to the tag's GitHub release. There is no
+      # gh-pages chart repo index; consumers install the .tgz directly.
+      - name: Upload chart to release
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" dist/*.tgz --clobber
