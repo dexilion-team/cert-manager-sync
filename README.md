@@ -9,6 +9,7 @@ Enable Kubernetes `cert-manager` to sync TLS certificates to AWS ACM, GCP, Hashi
   - [Background](#background)
   - [Certificate Stores](#certificate-stores)
     - [AWS ACM](#aws-acm)
+    - [Bunny.net](#bunnynet)
     - [Cloudflare](#cloudflare)
     - [DigitalOcean](#digitalocean)
     - [Filepath](#filepath)
@@ -118,6 +119,29 @@ If more than one certificate carries the tag, the operator adopts the one in
 use — preferring the most recently imported when none are — and logs the other
 ARNs as needing manual cleanup. **Nothing here deletes certificates**;
 duplicates that already exist are yours to remove.
+
+### Bunny.net
+
+Create a kube secret containing your Bunny.net account API key (found in the Bunny.net dashboard under Account Settings → API).
+
+```bash
+kubectl -n cert-manager \
+	create secret generic example-bunny-secret \
+	--from-literal api_key=XXXXX
+```
+
+You will then annotate your k8s TLS secret with this secret name to tell the operator to retrieve the Bunny.net API key from this location.
+
+The certificate is attached to one or more custom hostnames of a Pull Zone. Each hostname must already be added to the Pull Zone. Bunny.net identifies certificates by hostname, so renewals replace the existing certificate in place and no id is written back to the secret.
+
+Annotations:
+
+```yaml
+    cert-manager-sync.lestak.sh/bunny-enabled: "true" # sync certificate to Bunny.net
+    cert-manager-sync.lestak.sh/bunny-secret-name: "example-bunny-secret" # secret in same namespace which contains the bunny api key. If provided in format "namespace/secret-name", will look in that namespace for the secret
+    cert-manager-sync.lestak.sh/bunny-pull-zone-id: "12345" # id of the Pull Zone the hostname belongs to
+    cert-manager-sync.lestak.sh/bunny-hostname: "cdn.example.com" # custom hostname to attach the cert to. Separate multiple hostnames of the same Pull Zone with commas
+```
 
 ### Cloudflare
 
@@ -477,6 +501,7 @@ To enable delete-on-delete for every watched secret without setting per-secret a
 | Store | Delete supported |
 | --- | --- |
 | AWS ACM | yes |
+| Bunny.net | yes (removes the certificate from each configured hostname) |
 | Cloudflare | yes |
 | DigitalOcean | yes |
 | Filepath | yes (removes cert/key/ca files) |
@@ -561,6 +586,10 @@ metadata:
     cert-manager-sync.lestak.sh/acm-certificate-arn: "" # will be auto-filled by operator for in-place renewals
     cert-manager-sync.lestak.sh/acm-secret-name: "" # (optional if not using IRSA) secret in same namespace which contains the aws credentials. If provided in format "namespace/secret-name", will look in that namespace for the secret
     cert-manager-sync.lestak.sh/acm-adopt-existing: "false" # reuse an already-imported certificate tagged for this secret instead of importing a new one
+    cert-manager-sync.lestak.sh/bunny-enabled: "true" # sync certificate to Bunny.net
+    cert-manager-sync.lestak.sh/bunny-secret-name: "example-bunny-secret" # secret in same namespace which contains the bunny api key
+    cert-manager-sync.lestak.sh/bunny-pull-zone-id: "12345" # bunny pull zone id
+    cert-manager-sync.lestak.sh/bunny-hostname: "cdn.example.com" # comma-separated custom hostnames of the pull zone to attach the cert to
     cert-manager-sync.lestak.sh/cloudflare-enabled: "true" # sync certificate to Cloudflare
     cert-manager-sync.lestak.sh/cloudflare-secret-name: "example-cloudflare-secret" # secret in same namespace which contains the cloudflare api token. If provided in format "namespace/secret-name", will look in that namespace for the secret
     cert-manager-sync.lestak.sh/cloudflare-zone-id: "example-zone-id" # cloudflare zone id

@@ -12,6 +12,7 @@ import (
 	"github.com/robertlestak/cert-manager-sync/pkg/state"
 	"github.com/robertlestak/cert-manager-sync/pkg/tlssecret"
 	"github.com/robertlestak/cert-manager-sync/stores/acm"
+	"github.com/robertlestak/cert-manager-sync/stores/bunny"
 	"github.com/robertlestak/cert-manager-sync/stores/cloudflare"
 	"github.com/robertlestak/cert-manager-sync/stores/digitalocean"
 	"github.com/robertlestak/cert-manager-sync/stores/filepath"
@@ -48,6 +49,8 @@ func NewStore(storeType cmtypes.StoreType) (RemoteStore, error) {
 	switch storeType {
 	case cmtypes.ACMStoreType:
 		store = &acm.ACMStore{}
+	case cmtypes.BunnyStoreType:
+		store = &bunny.BunnyStore{}
 	case cmtypes.CloudflareStoreType:
 		store = &cloudflare.CloudflareStore{}
 	case cmtypes.DigitalOceanStoreType:
