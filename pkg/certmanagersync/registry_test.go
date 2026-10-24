@@ -12,6 +12,7 @@ import (
 func TestStoresImplementDelete(t *testing.T) {
 	deletable := []cmtypes.StoreType{
 		cmtypes.ACMStoreType,
+		cmtypes.BunnyStoreType,
 		cmtypes.CloudflareStoreType,
 		cmtypes.DigitalOceanStoreType,
 		cmtypes.FilepathStoreType,

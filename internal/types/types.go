@@ -13,6 +13,7 @@ type StoreType string
 
 const (
 	ACMStoreType          StoreType = "acm"
+	BunnyStoreType        StoreType = "bunny"
 	CloudflareStoreType   StoreType = "cloudflare"
 	DigitalOceanStoreType StoreType = "digitalocean"
 	FilepathStoreType     StoreType = "filepath"
@@ -27,6 +28,7 @@ const (
 
 var EnabledStores = []StoreType{
 	ACMStoreType,
+	BunnyStoreType,
 	CloudflareStoreType,
 	DigitalOceanStoreType,
 	FilepathStoreType,
