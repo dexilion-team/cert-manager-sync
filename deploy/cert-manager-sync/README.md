@@ -28,7 +28,7 @@ A Helm chart for cert-manager-sync
 | env | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"robertlestak/cert-manager-sync"` |  |
+| image.repository | string | `"ghcr.io/dexilion-team/cert-manager-sync"` |  |
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | leaderElection.createRole | bool | `true` | Create the namespaced `Role`/`RoleBinding` for the `Lease`. Set to `false` only if you manage that RBAC yourself — the operator needs `get`/`create`/`update` on `coordination.k8s.io` leases either way. |

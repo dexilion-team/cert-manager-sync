@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: robertlestak/cert-manager-sync
+  repository: ghcr.io/dexilion-team/cert-manager-sync
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

@@ -1,4 +1,7 @@
-FROM golang:1.26.1 as builder
+FROM --platform=$BUILDPLATFORM golang:1.26.1 as builder
+
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /app
 
@@ -8,7 +11,7 @@ RUN go mod download && go mod verify
 
 #RUN go test ./...
 
-RUN CGO_ENABLED=0 go build -o /app/cert-manager-sync cmd/cert-manager-sync/*.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /app/cert-manager-sync cmd/cert-manager-sync/*.go
 
 FROM scratch as app
 
